@@ -511,7 +511,67 @@ megaJoyControllerData_t getControllerData(void){
   //  values that were in those memory locations before
   megaJoyControllerData_t controllerData = getBlankDataForMegaController();
 
-  controllerData.buttonArray[0] = gc_status.data1 & 0x10 ? 1:0;
+  controllerData.buttonArray[0 / 8] = gc_status.data1 & 0x01 ? 1:0; // A
+  controllerData.buttonArray[1 / 8] = gc_status.data1 & 0x02 ? 1:0; // B
+  controllerData.buttonArray[2 / 8] = gc_status.data1 & 0x04 ? 1:0; // X
+  controllerData.buttonArray[3 / 8] = gc_status.data1 & 0x08 ? 1:0; // Y
+  controllerData.buttonArray[4 / 8] = gc_status.data2 & 0x10 ? 1:0; // Z
+  controllerData.buttonArray[5 / 8] = gc_status.data2 & 0x40 ? 1:0; // L
+  controllerData.buttonArray[6 / 8] = gc_status.data2 & 0x20 ? 1:0; // R
+       controllerData.dpad0UpOn = gc_status.data2 & 0x08 ? 1:0;
+     controllerData.dpad0DownOn = gc_status.data2 & 0x04 ? 1:0;
+     controllerData.dpad0LeftOn = gc_status.data2 & 0x01 ? 1:0;
+    controllerData.dpad0RightOn = gc_status.data2 & 0x02 ? 1:0;  
+
+
+
+
+    // Serial.print("Start: ");
+    // Serial.println(gc_status.data1 & 0x10 ? 1:0);
+
+    // Serial.print("Y:     ");
+    // Serial.println(gc_status.data1 & 0x08 ? 1:0);
+
+    // Serial.print("X:     ");
+    // Serial.println(gc_status.data1 & 0x04 ? 1:0);
+
+    // Serial.print("B:     ");
+    // Serial.println(gc_status.data1 & 0x02 ? 1:0);
+
+    // Serial.print("A:     ");
+    // Serial.println(gc_status.data1 & 0x01 ? 1:0);
+
+    // Serial.print("L:     ");
+    // Serial.println(gc_status.data2 & 0x40 ? 1:0);
+    // Serial.print("R:     ");
+    // Serial.println(gc_status.data2 & 0x20 ? 1:0);
+    // Serial.print("Z:     ");
+    // Serial.println(gc_status.data2 & 0x10 ? 1:0);
+
+    // Serial.print("Dup:   ");
+    // Serial.println(gc_status.data2 & 0x08 ? 1:0);
+    // Serial.print("Ddown: ");
+    // Serial.println(gc_status.data2 & 0x04 ? 1:0);
+    // Serial.print("Dright:");
+    // Serial.println(gc_status.data2 & 0x02 ? 1:0);
+    // Serial.print("Dleft: ");
+    // Serial.println(gc_status.data2 & 0x01 ? 1:0);
+
+    // Serial.print("Stick X:");
+    // Serial.println(gc_status.stick_x, DEC);
+    // Serial.print("Stick Y:");
+    // Serial.println(gc_status.stick_y, DEC);
+
+    // Serial.print("cStick X:");
+    // Serial.println(gc_status.cstick_x, DEC);
+    // Serial.print("cStick Y:");
+    // Serial.println(gc_status.cstick_y, DEC);
+
+    // Serial.print("L:     ");
+    // Serial.println(gc_status.left, DEC);
+    // Serial.print("R:     ");
+    // Serial.println(gc_status.right, DEC);
+
   
   // Set the analog sticks
   //  Since analogRead(pin) returns a 10 bit value,
