@@ -53,6 +53,7 @@
  */
 
 #include "pins_arduino.h"
+#include "MegaJoy.h"
 
 #define GC_PIN 2
 #define GC_PIN_DIR DDRD
@@ -85,21 +86,19 @@ static unsigned char zero_y;
 static void gc_send(unsigned char *buffer, char length);
 static int gc_get();
 static void init_gc_controller();
-static void print_gc_status();
+// static void print_gc_status();
 
 #include "crc_table.h"
 
 void setup()
 {
-  Serial.begin(115200);
+  // Serial.begin(115200);
 
-  Serial.println();
-  Serial.println("Code has started!");
-  Serial.flush();
+  // Serial.println();
+  // Serial.println("Code has started!");
+  // Serial.flush();
 
-  // Status LED
-  digitalWrite(13, LOW);
-  pinMode(13, OUTPUT);
+  setupMegaJoy();
 
   // Communication with gamecube controller on this pin
   // Don't remove these lines, we don't want to push +5V to the controller
@@ -118,11 +117,11 @@ void setup()
       interrupts();
       zero_x = gc_status.stick_x;
       zero_y = gc_status.stick_y;
-      Serial.print("GC zero point read: ");
-      Serial.print(zero_x, DEC);
-      Serial.print(", ");
-      Serial.println(zero_y, DEC);
-      Serial.flush();
+      // Serial.print("GC zero point read: ");
+      // Serial.print(zero_x, DEC);
+      // Serial.print(", ");
+      // Serial.println(zero_y, DEC);
+      // Serial.flush();
       
       // some crappy/broken controllers seem to give bad readings
       // occasionally. This is a cheap hack to keep reading the
@@ -441,6 +440,10 @@ void loop()
     int status;
     unsigned char data, addr;
 
+    // Keep getting fresh data for MegaJoy
+    megaJoyControllerData_t controllerData = getControllerData();
+    setControllerData(controllerData);
+
     // clear out incomming raw data buffer
     // this should be unnecessary
     //memset(gc_raw_dump, 0, sizeof(gc_raw_dump));
@@ -470,9 +473,9 @@ void loop()
     if (status == 0) {
         // problem with getting the gamecube controller status. Maybe it's unplugged?
         // set a neutral N64 string
-        Serial.print(millis(), DEC);
-        Serial.println(" | GC controller read error. Trying to re-initialize");
-        Serial.flush();
+        // Serial.print(millis(), DEC);
+        // Serial.println(" | GC controller read error. Trying to re-initialize");
+        // Serial.flush();
         memset(&gc_status, 0, sizeof(gc_status));
         gc_status.stick_x = zero_x;
         gc_status.stick_y = zero_y;
@@ -484,17 +487,50 @@ void loop()
     interrupts();
 
     // DEBUG: print it
-    print_gc_status();
+    // print_gc_status();
 
-    Serial.print(millis(), DEC);
-    Serial.print(" | GC stick: ");
-    Serial.print(gc_status.stick_x, DEC);
-    Serial.print(",");
-    Serial.print(gc_status.stick_y, DEC);
-    Serial.print("  To N64: ");
-    Serial.print(-zero_x + gc_status.stick_x, DEC);
-    Serial.print(",");
-    Serial.println(-zero_y + gc_status.stick_y, DEC);
-    Serial.flush();
+    // Serial.print(millis(), DEC);
+    // Serial.print(" | GC stick: ");
+    // Serial.print(gc_status.stick_x, DEC);
+    // Serial.print(",");
+    // Serial.print(gc_status.stick_y, DEC);
+    // Serial.print("  To N64: ");
+    // Serial.print(-zero_x + gc_status.stick_x, DEC);
+    // Serial.print(",");
+    // Serial.println(-zero_y + gc_status.stick_y, DEC);
+    // Serial.flush();
   
+}
+
+megaJoyControllerData_t getControllerData(void){
+  
+  // Set up a place for our controller data
+  //  Use the getBlankDataForController() function, since
+  //  just declaring a fresh dataForController_t tends
+  //  to get you one filled with junk from other, random
+  //  values that were in those memory locations before
+  megaJoyControllerData_t controllerData = getBlankDataForMegaController();
+
+  controllerData.buttonArray[0] = gc_status.data1 & 0x10 ? 1:0;
+  
+  // Set the analog sticks
+  //  Since analogRead(pin) returns a 10 bit value,
+  //  we need to perform a bit shift operation to
+  //  lose the 2 least significant bits and get an
+  //  8 bit number that we can use 
+  // controllerData.analogAxisArray[0] = analogRead(A0);
+  // controllerData.analogAxisArray[1] = 0;//analogRead(A1); 
+  // controllerData.analogAxisArray[2] = 1;//analogRead(A2); 
+  // controllerData.analogAxisArray[3] = 512;//analogRead(A3); 
+  // controllerData.analogAxisArray[4] = 1023;//analogRead(A4); 
+  // controllerData.analogAxisArray[5] = 1000;//analogRead(A5); 
+  // controllerData.analogAxisArray[6] = analogRead(A6); 
+  // controllerData.analogAxisArray[7] = analogRead(A7); 
+  // controllerData.analogAxisArray[8] = analogRead(A8); 
+  // controllerData.analogAxisArray[9] = analogRead(A9); 
+  // controllerData.analogAxisArray[10] = analogRead(A10); 
+  // controllerData.analogAxisArray[11] = analogRead(A11); 
+  
+  // And return the data!
+  return controllerData;
 }
