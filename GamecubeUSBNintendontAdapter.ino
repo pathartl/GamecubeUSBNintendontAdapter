@@ -502,6 +502,10 @@ void loop()
   
 }
 
+// void buttonPress(megaJoyControllerData_t controllerData, int button, int status) {
+//   controllerData.buttonArray[button / 8] |= status << (button % 8);
+// }
+
 megaJoyControllerData_t getControllerData(void){
   
   // Set up a place for our controller data
@@ -511,17 +515,20 @@ megaJoyControllerData_t getControllerData(void){
   //  values that were in those memory locations before
   megaJoyControllerData_t controllerData = getBlankDataForMegaController();
 
-  controllerData.buttonArray[0 / 8] = gc_status.data1 & 0x01 ? 1:0; // A
-  controllerData.buttonArray[1 / 8] = gc_status.data1 & 0x02 ? 1:0; // B
-  controllerData.buttonArray[2 / 8] = gc_status.data1 & 0x04 ? 1:0; // X
-  controllerData.buttonArray[3 / 8] = gc_status.data1 & 0x08 ? 1:0; // Y
-  controllerData.buttonArray[4 / 8] = gc_status.data2 & 0x10 ? 1:0; // Z
-  controllerData.buttonArray[5 / 8] = gc_status.data2 & 0x40 ? 1:0; // L
-  controllerData.buttonArray[6 / 8] = gc_status.data2 & 0x20 ? 1:0; // R
-       controllerData.dpad0UpOn = gc_status.data2 & 0x08 ? 1:0;
-     controllerData.dpad0DownOn = gc_status.data2 & 0x04 ? 1:0;
-     controllerData.dpad0LeftOn = gc_status.data2 & 0x01 ? 1:0;
-    controllerData.dpad0RightOn = gc_status.data2 & 0x02 ? 1:0;  
+  controllerData.buttonArray[0 / 8] |= (gc_status.data1 & 0x01 ? 1:0) << (0 % 8); // A
+  controllerData.buttonArray[1 / 8] |= (gc_status.data1 & 0x02 ? 1:0) << (1 % 8); // B
+  controllerData.buttonArray[2 / 8] |= (gc_status.data1 & 0x04 ? 1:0) << (2 % 8); // X
+  controllerData.buttonArray[3 / 8] |= (gc_status.data1 & 0x08 ? 1:0) << (3 % 8); // Y
+  controllerData.buttonArray[4 / 8] |= (gc_status.data2 & 0x10 ? 1:0) << (4 % 8); // Z
+  controllerData.buttonArray[5 / 8] |= (gc_status.data2 & 0x40 ? 1:0) << (5 % 8); // L
+  controllerData.buttonArray[6 / 8] |= (gc_status.data2 & 0x20 ? 1:0) << (6 % 8); // R
+  controllerData.buttonArray[7 / 8] |= (gc_status.data2 & 0x10 ? 1:0) << (7 % 8); // Start
+  controllerData.dpad0UpOn = gc_status.data2 & 0x08 ? 1:0;
+  controllerData.dpad0DownOn = gc_status.data2 & 0x04 ? 1:0;
+  controllerData.dpad0LeftOn = gc_status.data2 & 0x01 ? 1:0;
+  controllerData.dpad0RightOn = gc_status.data2 & 0x02 ? 1:0;  
+  controllerData.analogAxisArray[0] = map(gc_status.stick_x, 0, 255, 0, 1024);
+  controllerData.analogAxisArray[1] = 1024 - map(gc_status.stick_y, 0, 255, 0, 1024);
 
 
 
